@@ -92,7 +92,7 @@ const ChatBox = () => {
           })
         }
         
-        <Grid item xs = {12} md = {12}>
+        <Grid item xs = {10} md = {10}>
           <Paper> 
             <form noValidate autoComplete="off" onSubmit = {handleSubmit}>           
               <FormControl fullWidth>
@@ -103,8 +103,8 @@ const ChatBox = () => {
           </Paper>       
         </Grid>
 
-        <Grid item xs = {12} md = {12}>
-          <Button disableElevation size = "small" variant="contained" color="secondary" 
+        <Grid item align = 'right' xs = {2} md = {2}>
+          <Button size = "large" fullWidth disableElevation size = "small" variant="contained" color="secondary" 
             onClick={()=>{addMessage(message); sendMessage(message);}}
             > Send </Button>
         </Grid>       

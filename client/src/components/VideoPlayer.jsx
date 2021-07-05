@@ -10,6 +10,12 @@ const useStyles = makeStyles((theme) => ({
       width: '300px',
     },       
   },
+
+  videoBox : {
+    width : '550px',
+    height : '400px',
+    justifyText : 'center', 
+  },
  
   gridContainer: {
     justifyContent: 'center',
@@ -32,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const VideoPlayer = () => {
-  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call,userName,
+  const { name, callAccepted, myVideo, userVideo, callEnded, stream, userAudio, call,userName,
     showMyAudio,showMyVideo,showUserVideo,showUserAudio,setShowUserVideo } = useContext(SocketContext);
   const classes = useStyles();
   
@@ -40,13 +46,12 @@ const VideoPlayer = () => {
     <Grid container spacing = {1} className={classes.gridContainer}>      
       {stream && (
         <Paper className={classes.paper}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6}>           
             
-            {console.log(showMyVideo)}
             {
               showMyVideo ? 
               <video playsInline muted ref={myVideo} autoPlay className={classes.video} /> 
-              : <div ref = {myVideo} className={classes.video}> Video Hidden </div>
+              : <div ref = {myVideo} className={classes.videoBox}> Video Hidden </div>
             }
 
             
@@ -60,12 +65,12 @@ const VideoPlayer = () => {
         <Paper className={classes.paper}>
           <Grid item xs={12} md={6}>
             
-            {console.log(showUserVideo)}
+            {console.log("show user video = " + showUserVideo)}
             {
               showUserVideo && showUserAudio ? 
               <video playsInline ref={userVideo} autoPlay className={classes.video} /> :
               showUserVideo ? <video playInline muted ref={userVideo} autoPlay className={classes.video} /> :
-              showUserAudio ? <audio playInline ref={userVideo} autoPlay /> :
+              showUserAudio ? <div className={classes.videoBox}> Video Hidden <audio playInline ref={userVideo} autoPlay /> </div> :
               <div ref={userVideo} className={classes.video} /> 
             }
             {/* {
@@ -74,6 +79,11 @@ const VideoPlayer = () => {
             {
               showUserAudio && <audio playInline ref={userVideo} autoPlay/>
             } */}
+            {/* <video muted hidden = {!showUserVideo} playsInline ref={userVideo} autoPlay className={classes.video} />
+            {
+              showUserAudio && <audio playInline ref={userAudio} autoPlay/>
+            } */}
+
 
             <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{ call.name || userName ||  'Name' }</Typography>
             

@@ -30,6 +30,8 @@ const ContextProvider = ({ children }) => {
   const userVideo = useRef();
   const connectionRef = useRef();
   const userId = useRef();
+  
+  
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -53,7 +55,17 @@ const ContextProvider = ({ children }) => {
     })
 
     socket.on("toggle-video-status",(status)=>{
-      //setShowUserVideo((status)=>(!status));
+      //answerCall();
+      setShowUserVideo((status)=>(!status));
+    })
+
+    socket.on("toggle-audio-status",(status)=>{
+      console.log('setting mute/unmute for caller')
+      setShowUserAudio((muted) => !muted);
+    })
+
+    socket.on("end-call", ()=>{
+      window.location.reload();
     })
   }, []);
 
@@ -69,6 +81,8 @@ const ContextProvider = ({ children }) => {
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
+      
+      
     });
 
     peer.signal(call.signal);
@@ -116,9 +130,14 @@ const ContextProvider = ({ children }) => {
   }
 
   const toggleAudio = () => {
+    // console.log('tried to toggle my audio');
+    // console.log('call accepted =' + callAccepted);
+    // console.log('call ended='+callEnded);
     setShowMyAudio((isAudible) => !isAudible);
-
-    socket.emit('toggle-audio',userId.current,showMyAudio);
+    if(callAccepted && !callEnded) {
+      console.log('tried to toggle my audio');
+      socket.emit('toggle-audio',userId.current,showMyAudio);
+    }
   }
 
   const  toggleVideo = () => {

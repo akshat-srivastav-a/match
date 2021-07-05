@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Sidebar = ({ children }) => {
   const { me, callAccepted, name, setName, callEnded, leaveCall, callUser,
-    toggleAudio,toggleVideo } = useContext(SocketContext);
+    toggleAudio,toggleVideo,showMyAudio,showMyVideo, } = useContext(SocketContext);
   const [idToCall, setIdToCall] = useState('');
   const classes = useStyles();
 
@@ -71,17 +71,17 @@ const Sidebar = ({ children }) => {
                 </Button>
               )}
             </Grid>
-            <Grid item xs = {12} md = {6} fullWidth className={classes.padding}>
-              <Button variant="contained" color="primary"  onClick = {toggleAudio}>
-                mute/unmute
+            {/* <Grid item xs = {12} md = {6} fullWidth className={classes.padding}>
+              <Button fullWidth variant="contained" color="primary"  onClick = {toggleAudio}>
+                {showMyAudio ? "mute" : "unmute"} 
               </Button>
               
             </Grid>
             <Grid item xs = {12} md = {6} fullWidth className={classes.padding}>
-              <Button variant="contained" color="primary" onClick = {toggleVideo}>
-                  show/hide video
+              <Button fullWidth variant="contained" color="primary" onClick = {toggleVideo}>
+                  {showMyVideo ? "hide video" : "show video"}
               </Button>
-            </Grid>
+            </Grid> */}
           </Grid>
         </form>
         {children}
