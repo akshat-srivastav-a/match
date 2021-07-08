@@ -1,6 +1,11 @@
 import React, { useContext } from 'react';
 import { Grid, Typography, Paper, makeStyles, Button } from '@material-ui/core';
 
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+
 import { SocketContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,7 +21,11 @@ const useStyles = makeStyles((theme) => ({
     height : '400px',
     justifyText : 'center', 
   },
- 
+  
+  optionsPaper : {
+    width : '600px',
+  },
+
   gridContainer: {
     justifyContent: 'center',
     [theme.breakpoints.down('xs')]: {
@@ -39,57 +48,59 @@ const useStyles = makeStyles((theme) => ({
 
 const VideoPlayer = () => {
   const { name, callAccepted, myVideo, userVideo, callEnded, stream, userAudio, call,userName,
-    showMyAudio,showMyVideo,showUserVideo,showUserAudio,setShowUserVideo } = useContext(SocketContext);
+    showMyAudio,showMyVideo,showUserVideo,showUserAudio,setShowUserVideo,toggleAudio,toggleVideo } = useContext(SocketContext);
+
   const classes = useStyles();
   
   return (
     <Grid container spacing = {1} className={classes.gridContainer}>      
       {stream && (
         <Paper className={classes.paper}>
-          <Grid item xs={12} md={6}>           
-            
-            {
-              showMyVideo ? 
-              <video playsInline muted ref={myVideo} autoPlay className={classes.video} /> 
-              : <div ref = {myVideo} className={classes.videoBox}> Video Hidden </div>
-            }
+          <Grid item xs={12} md={6}>
 
-            
+            <video playInline muted ref={myVideo} autoPlay className={classes.video} style = {
+              { opacity : `${showMyVideo ? "1" : "0" }` }
+            } />           
 
             {/* <video playsInline muted ref={myVideo} autoPlay className={classes.video} />  */}
-            <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{name || 'Name'}</Typography>
+            <Grid item xs = {12} md = {6} >
+              <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{name || 'Name'}</Typography>
+              
+            </Grid>
+            
           </Grid>
         </Paper>
       )}
+           
+
       {callAccepted && !callEnded && (
         <Paper className={classes.paper}>
           <Grid item xs={12} md={6}>
+
+            <video playInline muted = {!showUserAudio} ref={userVideo} autoPlay className={classes.video} 
+              style = {
+                { opacity: `${showUserVideo ? "1" : "0" }`} 
+            }/>
             
-            {console.log("show user video = " + showUserVideo)}
-            {
-              showUserVideo && showUserAudio ? 
-              <video playsInline ref={userVideo} autoPlay className={classes.video} /> :
-              showUserVideo ? <video playInline muted ref={userVideo} autoPlay className={classes.video} /> :
-              showUserAudio ? <div className={classes.videoBox}> Video Hidden <audio playInline ref={userVideo} autoPlay /> </div> :
-              <div ref={userVideo} className={classes.video} /> 
-            }
-            {/* {
-              showUserVideo && <video muted playsInline ref={userVideo} autoPlay className={classes.video} /> 
-            }
-            {
-              showUserAudio && <audio playInline ref={userVideo} autoPlay/>
-            } */}
-            {/* <video muted hidden = {!showUserVideo} playsInline ref={userVideo} autoPlay className={classes.video} />
-            {
-              showUserAudio && <audio playInline ref={userAudio} autoPlay/>
-            } */}
-
-
             <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{ call.name || userName ||  'Name' }</Typography>
             
           </Grid>
         </Paper>
       )}
+
+      <Grid item xs = {12} md = {12}/>
+      <Paper align = 'center' elevation = {12} className={classes.optionsPaper}>
+        <Button onClick={toggleAudio}>
+                  {
+                    showMyAudio ? <MicIcon fontSize = "large"/> : <MicOffIcon fontSize = "large"/>
+                  }
+              </Button>
+              <Button onClick={toggleVideo}>
+                {
+                  showMyVideo ? <VideocamIcon fontSize = "large"/> : <VideocamOffIcon fontSize = "large"/>
+                }
+        </Button>
+      </Paper>   
        
       
     </Grid>

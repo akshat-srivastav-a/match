@@ -4,18 +4,28 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 
-// const socket = io('http://localhost:5000');
+//const socket = io('http://localhost:5000');
 //const socket = io('https://warm-wildwood-81069.herokuapp.com');
 const socket = io('https://match-video-chat.herokuapp.com/')
 
 const ContextProvider = ({ children }) => {
+  
+  // keeping track of the status of the call
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
-  const [stream, setStream] = useState();
+  
+  // names
   const [name, setName] = useState('');
+  
+
+  const [stream, setStream] = useState();
+  
   const [call, setCall] = useState({});
   const [me, setMe] = useState('');
+  
+  // text : meeting chat , commonText : common chat
   const [text,setText] = useState(["If you won't speak, then type!"]);
+  const [commonText,setCommonText] = useState([]);
   
   // need some properties to keep track of audio and video being muted
   const [showMyAudio,setShowMyAudio] = useState(true);
@@ -131,34 +141,41 @@ const ContextProvider = ({ children }) => {
   }
 
   const toggleAudio = () => {
+    
+    // setShowMyAudio((currentStatus) => {
+    //   socket.emit("updateMyMedia", {
+    //     type: "mic",
+    //     currentMediaStatus: !currentStatus,
+    //   });
+    //   stream.getAudioTracks()[0].enabled = !currentStatus;
+    //   return !currentStatus;
+    // });
+    
+
+
     // console.log('tried to toggle my audio');
     // console.log('call accepted =' + callAccepted);
     // console.log('call ended='+callEnded);
     setShowMyAudio((isAudible) => !isAudible);
-    if(callAccepted && !callEnded) {
-      console.log('tried to toggle my audio');
+    if(true) {
+      //console.log('tried to toggle my audio');
       socket.emit('toggle-audio',userId.current,showMyAudio);
     }
   }
 
   const  toggleVideo = () => {
     
-      // if(!showMyVideo){
-      //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      // .then((currentStream) => {
-      //   setStream(currentStream);
-
-      //   myVideo.current.srcObject = currentStream;
-      // });
-      // setShowMyVideo((isVisible)=>!isVisible);
-     
-      // }
-      // socket.emit('toggle-video',userId.current,showMyVideo);
+    // setShowMyVideo((currentStatus) => {
+    //   socket.emit("updateMyMedia", {
+    //     type: "video",
+    //     currentMediaStatus: !currentStatus,
+    //     id : userId.current,
+    //   });
+    //   stream.getVideoTracks()[0].enabled = !currentStatus;
+    //   return !currentStatus;
+    // });
     
-    
-      // don't really expect it so not doing anything
-    
-
+    //console.log("toggling my video");
     setShowMyVideo((isVisible) => !isVisible);
     if(true){
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -168,6 +185,7 @@ const ContextProvider = ({ children }) => {
         myVideo.current.srcObject = currentStream;
       });
     }
+
     socket.emit('toggle-video',userId.current,showMyVideo);
     
   }

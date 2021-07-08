@@ -3,6 +3,7 @@ import { Button, TextField, Grid, Typography, Container, Paper, FormControl,AppB
 
 import { SocketContext } from '../Context';
 
+import SendIcon from '@material-ui/icons/Send';
 
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -25,7 +26,10 @@ const useStyles = makeStyles((theme) => ({
   },
   textChat: {
     padding : '10px',
-  }
+  },
+  sendButton: {
+    height : "100%",
+  },
 }));
 
 
@@ -39,20 +43,29 @@ function NewlineText(props) {
 
 
 
-const ChatBox = () => {
-  const { name,text,setText,sendMessage } = useContext(SocketContext);
+const ChatBox = ({common}) => {
+  console.log("common = " + common);
+  const { name,text,setText,sendMessage,setCommonText,commonText} = useContext(SocketContext);
   const [message,setMessage] = useState('');
   
   function addMessage(message){
-    setText(text=>[...text,(name||'You') + " : " + message]);
+    if(common){
+      setText(commmonText=>[...commonText,(name||'You') + " : " + message]);
+      sendCommonMessage(message);
+    }
+    else{
+      setText(text=>[...text,(name||'You') + " : " + message]);
+      sendMessage(message);
+    }    
     setMessage('');
+    
   }
 
   function handleSubmit(e){
     e.preventDefault();
     addMessage(message);
-    sendMessage(message); 
   }
+
 
   
   const classes = useStyles();
@@ -63,9 +76,9 @@ const ChatBox = () => {
       <Container maxWidth="md">
          <Grid spacing = {1} container justify = "right">
            <Grid item xs = {12}>
-           <AppBar position="static">
+           {/* <AppBar position="static">
               <Typography variant="h4" component = "h1" align = "center"> Text Chat </Typography>
-           </AppBar>
+           </AppBar> */}
            </Grid>
 
           {/* <Grid item xs = {6}>
@@ -82,6 +95,16 @@ const ChatBox = () => {
           
 
         {
+          common ? 
+          commonText != undefined && 
+          commonText.map(message =>{
+            return (
+              <Grid item xs = {12}>
+                <Paper  className = {classes.textChat} elevation = {12}> 
+                {message} </Paper>
+              </Grid>)
+          })
+          :
           text != undefined && 
           text.map(message =>{
             return (
@@ -104,9 +127,10 @@ const ChatBox = () => {
         </Grid>
 
         <Grid item align = 'right' xs = {2} md = {2}>
-          <Button size = "large" fullWidth disableElevation size = "small" variant="contained" color="secondary" 
-            onClick={()=>{addMessage(message); sendMessage(message);}}
-            > Send </Button>
+          <Button className = {classes.sendButton} size = "large" fullWidth disableElevation size = "small" variant="contained" 
+          color="secondary" onClick={()=>{addMessage(message); } }
+            > <SendIcon>
+              </SendIcon> Send </Button>
         </Grid>       
           
         

@@ -65,7 +65,12 @@ io.on("connection", (socket) => {
 	// event to send a message to everyone connected to the server/socket
 	socket.on("public-message",(room,message)=>{
 		console.log("public message : " + message);
-	})	
+	})
+	
+	socket.on("updateMyMedia", ({type,currentMediaStatus,id}) => {
+		console.log(" updating " + type);
+		io.to(userId).emit("updateUserMedia", type , currentMediaStatus,id);
+	})
 
 });
 
