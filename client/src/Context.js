@@ -177,14 +177,7 @@ const ContextProvider = ({ children }) => {
     
     //console.log("toggling my video");
     setShowMyVideo((isVisible) => !isVisible);
-    if(true){
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-
-        myVideo.current.srcObject = currentStream;
-      });
-    }
+    
 
     socket.emit('toggle-video',userId.current,showMyVideo);
     
