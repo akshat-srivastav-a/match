@@ -45,12 +45,12 @@ function NewlineText(props) {
 
 const ChatBox = ({common}) => {
   console.log("common = " + common);
-  const { name,text,setText,sendMessage,setCommonText,commonText} = useContext(SocketContext);
+  const { name,text,setText,sendMessage,setCommonText,commonText,sendCommonMessage} = useContext(SocketContext);
   const [message,setMessage] = useState('');
   
   function addMessage(message){
     if(common){
-      setText(commmonText=>[...commonText,(name||'You') + " : " + message]);
+      //setCommonText(commmonText=>[...commonText,(name||'You') + " : " + message]);
       sendCommonMessage(message);
     }
     else{

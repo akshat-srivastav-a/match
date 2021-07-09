@@ -6,10 +6,12 @@ import VideoPlayer from './components/VideoPlayer';
 import Sidebar from './components/Sidebar';
 import Notifications from './components/Notifications';
 import ChatBox from './components/ChatBox';
+import Board from './components/Board/Board';
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
+
+import {Grid} from '@material-ui/core';
+
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
   // },
   appBar : {
     backgroundColor:'#2F2FA2',
+    
     color : 'white',
     align: 'left',
     padding : '10px',
@@ -81,8 +84,11 @@ const App = () => {
       <Sidebar>
         <Notifications />
       </Sidebar>
-      <ChatBox common = {false}></ChatBox>
-      
+      <Grid container spacing={1}>
+        <Grid item md = {6} xs = {12}><ChatBox common = {true}></ChatBox></Grid>
+        <Grid item md = {6} xs = {12}><ChatBox common = {false}></ChatBox></Grid>
+      </Grid>
+    
       
     </div>
   );

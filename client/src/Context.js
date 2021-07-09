@@ -4,9 +4,9 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 
-//const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5000');
 //const socket = io('https://warm-wildwood-81069.herokuapp.com');
-const socket = io('https://match-video-chat.herokuapp.com/')
+//const socket = io('https://match-video-chat.herokuapp.com/')
 
 const ContextProvider = ({ children }) => {
   
@@ -24,8 +24,8 @@ const ContextProvider = ({ children }) => {
   const [me, setMe] = useState('');
   
   // text : meeting chat , commonText : common chat
-  const [text,setText] = useState(["If you won't speak, then type!"]);
-  const [commonText,setCommonText] = useState([]);
+  const [text,setText] = useState(["This is your private chat"]);
+  const [commonText,setCommonText] = useState(["This is an open chat room. Say Hi!"]);
   
   // need some properties to keep track of audio and video being muted
   const [showMyAudio,setShowMyAudio] = useState(true);
@@ -41,8 +41,7 @@ const ContextProvider = ({ children }) => {
   const userVideo = useRef();
   const connectionRef = useRef();
   const userId = useRef();
-  
-  
+
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -76,19 +75,50 @@ const ContextProvider = ({ children }) => {
     })
 
     socket.on("end-call", ()=>{
-      window.location.reload();
+      setCallAccepted(false);
+      setCallEnded(true);
     })
+
+    socket.on('recieve-message', (message,name) => {
+      console.log('recieved common message');
+      setCommonText((text)=>[...text,name + " : " + message])
+    })
+
+    socket.on("canvas-data", function (data) {
+          var root = this;
+          var interval = setInterval(function () {
+            if (root.isDrawing) return;
+            root.isDrawing = true;
+            clearInterval(interval);
+            var image = new Image();
+            var canvas = document.querySelector("#board");
+            var ctx = canvas.getContext("2d");
+            image.onload = function () {
+              ctx.drawImage(image, 0, 0);
+    
+              root.isDrawing = false;
+            };
+            image.src = data;
+          }, 200);
+    });
+
+
+
   }, []);
 
   const answerCall = () => {
     setCallAccepted(true);
 
     const peer = new Peer({ initiator: false, trickle: false, stream });
+    
 
     peer.on('signal', (data) => {
       userId.current = call.from;
+            
       socket.emit('answerCall', { signal: data, to: call.from }, name);
     });
+
+    
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
@@ -127,9 +157,11 @@ const ContextProvider = ({ children }) => {
   const leaveCall = () => {
     setCallEnded(true);
 
+    socket.emit('end-call',userId.current);
+
     connectionRef.current.destroy();
 
-    window.location.reload();
+    
   };
 
   const sendMessage = (message) => {
@@ -138,6 +170,12 @@ const ContextProvider = ({ children }) => {
       console.log("going to " + userId.current);
       socket.emit('send-message', name,userId.current,message);
     }
+  }
+
+  const sendCommonMessage = (message) => {
+
+    setCommonText((text)=>[...text,name + " : " + message]);
+    socket.emit('public-message',name,message);
   }
 
   const toggleAudio = () => {
@@ -191,6 +229,7 @@ const ContextProvider = ({ children }) => {
     socket.emit('update-avatar',userId.current,avatar);
   }
 
+
   return (
     <SocketContext.Provider value={{
       call,
@@ -215,6 +254,10 @@ const ContextProvider = ({ children }) => {
       setShowUserVideo,
       toggleAudio,
       toggleVideo,
+      socket,
+      sendCommonMessage,
+      commonText,
+      setCommonText,
     }}
     >
       {children}

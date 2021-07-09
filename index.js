@@ -60,17 +60,17 @@ io.on("connection", (socket) => {
 		console.log("toggling audio");
 		io.to(userId).emit("toggle-audio-status",show);
 	})
-
+	
+	socket.on("end-call",(id) =>{
+		io.to(id).emit("end-call",100);
+	})
 
 	// event to send a message to everyone connected to the server/socket
-	socket.on("public-message",(room,message)=>{
+	socket.on("public-message",(name,message)=>{
 		console.log("public message : " + message);
-	})
+		socket.broadcast.emit('recieve-message',message,name);
+	})	
 	
-	socket.on("updateMyMedia", ({type,currentMediaStatus,id}) => {
-		console.log(" updating " + type);
-		io.to(userId).emit("updateUserMedia", type , currentMediaStatus,id);
-	})
 
 });
 
