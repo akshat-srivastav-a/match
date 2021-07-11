@@ -16,12 +16,16 @@ const ContextProvider = ({ children }) => {
   
   // names
   const [name, setName] = useState('');
-  
-
+  const [userName, setUserName] = useState('');
+ 
+  // user's audio-video stream
   const [stream, setStream] = useState();
-  
+  // call state to keep track of current call data
   const [call, setCall] = useState({});
+  // the id socket.io gives 
+  // me: current user's id , userId : the caller/callee's id
   const [me, setMe] = useState('');
+  const userId = useRef();
   
   // text : meeting chat , commonText : common chat
   const [text,setText] = useState(["This is your private chat"]);
@@ -32,17 +36,14 @@ const ContextProvider = ({ children }) => {
   const [showMyVideo,setShowMyVideo] = useState(true);
   const [showUserAudio,setShowUserAudio] = useState(true);
   const [showUserVideo,setShowUserVideo] = useState(true);
-
-  // keep track of avatars
-  const [myAvatar,setMyAvatar] = useState({color: "orange",text:"N"});
-  const [userAvatar,setUserAvatar] = useState({color: "orange",text:"N"});
   
+  // references to streams of users and the connection
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-  const userId = useRef();
+  
 
-  const [userName, setUserName] = useState('');
+  
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -67,13 +68,11 @@ const ContextProvider = ({ children }) => {
     })
 
     socket.on("toggle-video-status",(status)=>{
-      //answerCall();
       setShowUserVideo(status);
     })
 
-    socket.on("toggle-audio-status",(status)=>{
-      console.log('setting mute/unmute for caller')
-      setShowUserAudio((muted) => !muted);
+    socket.on("toggle-audio-status",(status)=>{      
+      setShowUserAudio(status);
     })
 
     socket.on("end-call", ()=>{
@@ -86,28 +85,12 @@ const ContextProvider = ({ children }) => {
       setCommonText((text)=>[...text,name + " : " + message])
     })
 
-    socket.on("canvas-data", function (data) {
-          var root = this;
-          var interval = setInterval(function () {
-            if (root.isDrawing) return;
-            root.isDrawing = true;
-            clearInterval(interval);
-            var image = new Image();
-            var canvas = document.querySelector("#board");
-            var ctx = canvas.getContext("2d");
-            image.onload = function () {
-              ctx.drawImage(image, 0, 0);
-    
-              root.isDrawing = false;
-            };
-            image.src = data;
-          }, 200);
-    });
-
 
 
   }, []);
 
+  // function called when current user clicks the answer call button
+  // to a call being recieved
   const answerCall = () => {
     setCallAccepted(true);
 
@@ -116,15 +99,15 @@ const ContextProvider = ({ children }) => {
 
     peer.on('signal', (data) => {
       userId.current = call.from;
-            
+      // pass the signal data to transfer video and audio along with name,
+      // video status and audio status      
       socket.emit('answerCall', { signal: data, to: call.from }, name,showMyVideo,showMyAudio);
     });
 
     
-
+    // once the peer's stream is available we set the userVideo reference 
     peer.on('stream', (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-      
+      userVideo.current.srcObject = currentStream;     
       
     });
 
@@ -133,26 +116,30 @@ const ContextProvider = ({ children }) => {
     connectionRef.current = peer;
   };
 
+  // function called when current user intitates a call 
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     userId.current = id;
 
+    // when we call a user we pass the signal data, id of user to call,
+    // current user's id and the audio and video status
     peer.on('signal', (data) => {
       socket.emit('callUser', { userToCall: id, signalData: data, from: me, name },showMyVideo,showMyAudio);
     });
 
+    // when the peer's stream is available, set the userVideo reference
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
     });
 
+    // event that occurs when the call made is accepted
     socket.on('callAccepted', (signal,name,videoStatus,audioStatus) => {
       setCallAccepted(true);
-      //userName.current = name;
+      // setting user's name, audio and video status
       setUserName(name);
       setShowUserVideo(videoStatus);
       setShowUserAudio(audioStatus);
-
-      //console.log(userName.current);
+      
       peer.signal(signal);
     });
 
@@ -160,6 +147,7 @@ const ContextProvider = ({ children }) => {
     
   };
 
+  // called when the user clicks on the hand up button
   const leaveCall = () => {
     setCallEnded(true);
 
@@ -170,61 +158,40 @@ const ContextProvider = ({ children }) => {
     
   };
 
+  // send message in private chat visible only to those users
+  // in the current meeting
   const sendMessage = (message) => {
-    if(callAccepted && !callEnded) {
-      console.log("got here");
-      console.log("going to " + userId.current);
+    // only send this message if currently in a call
+    if(callAccepted && !callEnded) {      
       socket.emit('send-message', name,userId.current,message);
     }
   }
 
+  // function to send message in the open chat
   const sendCommonMessage = (message) => {
-
     setCommonText((text)=>[...text,name + " : " + message]);
     socket.emit('public-message',name,message);
   }
 
-  const toggleAudio = () => {
+  // function to toggle audio status of current user
+  const toggleAudio = () => {  
     
-    // setShowMyAudio((currentStatus) => {
-    //   socket.emit("updateMyMedia", {
-    //     type: "mic",
-    //     currentMediaStatus: !currentStatus,
-    //   });
-    //   stream.getAudioTracks()[0].enabled = !currentStatus;
-    //   return !currentStatus;
-    // });
-    
-
-
-    // console.log('tried to toggle my audio');
-    // console.log('call accepted =' + callAccepted);
-    // console.log('call ended='+callEnded);
     let currentStatus;
+    // since the "setState" functions are asynchronous, we need to keep track of
+    // current status 
     setShowMyAudio((isAudible) =>{
       currentStatus = !isAudible;
       return currentStatus;
     });
-    if(true) {
-      //console.log('tried to toggle my audio');
-      socket.emit('toggle-audio',userId.current,currentStatus);
-    }
+    socket.emit('toggle-audio',userId.current,currentStatus);
   }
 
-  const  toggleVideo = () => {
-    
-    // setShowMyVideo((currentStatus) => {
-    //   socket.emit("updateMyMedia", {
-    //     type: "video",
-    //     currentMediaStatus: !currentStatus,
-    //     id : userId.current,
-    //   });
-    //   stream.getVideoTracks()[0].enabled = !currentStatus;
-    //   return !currentStatus;
-    // });
-    
-    //console.log("toggling my video");
+  // function to toggle video status of current user
+  const  toggleVideo = () => {    
+  
     let currentStatus;
+    // since the "setState" functions are asynchronous, we need to keep track of
+    // current status 
     setShowMyVideo((isVisible) =>{ 
       currentStatus = !isVisible;
       return currentStatus;
@@ -234,15 +201,6 @@ const ContextProvider = ({ children }) => {
     socket.emit('toggle-video',userId.current,currentStatus);
     
   }
-
-  const updateName = (name) => {
-    socket.emit('update-name',userId.current,name);
-  }
-
-  const updateAvatar = (avatar) => {
-    socket.emit('update-avatar',userId.current,avatar);
-  }
-
 
   return (
     <SocketContext.Provider value={{

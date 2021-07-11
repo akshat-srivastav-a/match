@@ -62,11 +62,17 @@ const VideoPlayer = () => {
               { opacity : `${showMyVideo ? "1" : "0" }` }
             } />           
 
-            {/* <video playsInline muted ref={myVideo} autoPlay className={classes.video} />  */}
+           
             <Grid item xs = {12} md = {6} >
-              <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{name || 'Name'}</Typography>
+              <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{(name || 'Name') + " "}
+              { !showMyAudio ? <MicOffIcon fontSize = "small"/> : " "}
+              { !showMyVideo ? <VideocamOffIcon fontSize = "small"/> : " "}
+
+              </Typography>
               
             </Grid>
+
+            
             
           </Grid>
         </Paper>

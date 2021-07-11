@@ -7,7 +7,7 @@ import SendIcon from '@material-ui/icons/Send';
 
 
 import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,14 +35,6 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-
-function NewlineText(props) {
-    const text = props.text;
-    return text.split('\n').map(str => <p>{str}</p>);
-}
-
-
-
 const ChatBox = ({common}) => {
   console.log("common = " + common);
   const { name,text,setText,sendMessage,setCommonText,commonText,sendCommonMessage} = useContext(SocketContext);
@@ -50,7 +42,7 @@ const ChatBox = ({common}) => {
   
   function addMessage(message){
     if(common){
-      //setCommonText(commmonText=>[...commonText,(name||'You') + " : " + message]);
+      
       sendCommonMessage(message);
     }
     else{
@@ -74,23 +66,7 @@ const ChatBox = ({common}) => {
     <>
       
       <Container maxWidth="md">
-         <Grid spacing = {1} container justify = "right">
-           <Grid item xs = {12}>
-           {/* <AppBar position="static">
-              <Typography variant="h4" component = "h1" align = "center"> Text Chat </Typography>
-           </AppBar> */}
-           </Grid>
-
-          {/* <Grid item xs = {6}>
-          <Avatar alt="Remy Sharp" src="D:/Web Dev Workspace/engage/react-video-chat/project_video_chat/client/src/components/avatar1.jpg" className={classes.small} />
-          <Avatar alt="Remy Sharp" src="s/avatar1.jpg" />
-          <Avatar alt="Remy Sharp" src="../static/images/avatar1.jpg" className={classes.large} />
-          </Grid> */}
-
-          {/* <Paper>
-            <NewlineText text = {text}></NewlineText>       
-            
-          </Paper> */}
+         <Grid spacing = {1} container justify = "right">  
 
           
 
