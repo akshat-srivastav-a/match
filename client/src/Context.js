@@ -4,9 +4,9 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 
-// const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5000');
 //const socket = io('https://warm-wildwood-81069.herokuapp.com');
-const socket = io('https://match-video-chat.herokuapp.com/')
+// const socket = io('https://match-video-chat.herokuapp.com/')
 
 const ContextProvider = ({ children }) => {
   
@@ -54,8 +54,10 @@ const ContextProvider = ({ children }) => {
 
     socket.on('me', (id) => setMe(id));
 
-    socket.on('callUser', ({ from, name: callerName, signal }) => {
+    socket.on('callUser', ({ from, name: callerName, signal },videoStatus,audioStatus) => {
       setCall({ isReceivingCall: true, from, name: callerName, signal });
+      setShowUserVideo(videoStatus);
+      setShowUserAudio(audioStatus);
     });
 
     socket.on("get-message",(name,message) => {
@@ -66,7 +68,7 @@ const ContextProvider = ({ children }) => {
 
     socket.on("toggle-video-status",(status)=>{
       //answerCall();
-      setShowUserVideo((status)=>(!status));
+      setShowUserVideo(status);
     })
 
     socket.on("toggle-audio-status",(status)=>{
@@ -115,7 +117,7 @@ const ContextProvider = ({ children }) => {
     peer.on('signal', (data) => {
       userId.current = call.from;
             
-      socket.emit('answerCall', { signal: data, to: call.from }, name);
+      socket.emit('answerCall', { signal: data, to: call.from }, name,showMyVideo,showMyAudio);
     });
 
     
@@ -136,22 +138,26 @@ const ContextProvider = ({ children }) => {
     userId.current = id;
 
     peer.on('signal', (data) => {
-      socket.emit('callUser', { userToCall: id, signalData: data, from: me, name });
+      socket.emit('callUser', { userToCall: id, signalData: data, from: me, name },showMyVideo,showMyAudio);
     });
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
     });
 
-    socket.on('callAccepted', (signal,name) => {
+    socket.on('callAccepted', (signal,name,videoStatus,audioStatus) => {
       setCallAccepted(true);
       //userName.current = name;
       setUserName(name);
+      setShowUserVideo(videoStatus);
+      setShowUserAudio(audioStatus);
+
       //console.log(userName.current);
       peer.signal(signal);
     });
 
     connectionRef.current = peer;
+    
   };
 
   const leaveCall = () => {
@@ -194,10 +200,14 @@ const ContextProvider = ({ children }) => {
     // console.log('tried to toggle my audio');
     // console.log('call accepted =' + callAccepted);
     // console.log('call ended='+callEnded);
-    setShowMyAudio((isAudible) => !isAudible);
+    let currentStatus;
+    setShowMyAudio((isAudible) =>{
+      currentStatus = !isAudible;
+      return currentStatus;
+    });
     if(true) {
       //console.log('tried to toggle my audio');
-      socket.emit('toggle-audio',userId.current,showMyAudio);
+      socket.emit('toggle-audio',userId.current,currentStatus);
     }
   }
 
@@ -214,10 +224,14 @@ const ContextProvider = ({ children }) => {
     // });
     
     //console.log("toggling my video");
-    setShowMyVideo((isVisible) => !isVisible);
+    let currentStatus;
+    setShowMyVideo((isVisible) =>{ 
+      currentStatus = !isVisible;
+      return currentStatus;
+    });
     
 
-    socket.emit('toggle-video',userId.current,showMyVideo);
+    socket.emit('toggle-video',userId.current,currentStatus);
     
   }
 

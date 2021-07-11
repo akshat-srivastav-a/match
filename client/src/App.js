@@ -88,6 +88,8 @@ const App = () => {
         <Grid item md = {6} xs = {12}><ChatBox common = {true}></ChatBox></Grid>
         <Grid item md = {6} xs = {12}><ChatBox common = {false}></ChatBox></Grid>
       </Grid>
+
+      
     
       
     </div>

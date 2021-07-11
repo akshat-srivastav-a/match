@@ -82,7 +82,10 @@ const VideoPlayer = () => {
                 { opacity: `${showUserVideo ? "1" : "0" }`} 
             }/>
             
-            <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{ call.name || userName ||  'Name' }</Typography>
+            <Typography variant="h6" className = {classes.nameStyle} gutterBottom>{ (call.name || userName ||  'Name') + " " }
+              { !showUserAudio ? <MicOffIcon fontSize = "small"/> : " "}
+              { !showUserVideo ? <VideocamOffIcon fontSize = "small"/> : " "} 
+            </Typography>
             
           </Grid>
         </Paper>

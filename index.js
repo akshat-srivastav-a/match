@@ -31,15 +31,15 @@ io.on("connection", (socket) => {
 
 	// event to call a user, passed in the userId of the user to call
 	// signalData(simple-peer), id of caller, name of caller
-	socket.on("callUser", ({ userToCall, signalData, from, name }) => {
-		io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+	socket.on("callUser", ({ userToCall, signalData, from, name },videoStatus,audioStatus) => {
+		io.to(userToCall).emit("callUser", { signal: signalData, from, name },videoStatus,audioStatus);
 	});
 
 	// event to answer an incoming call
 	// takes in signal data and name of receiver to send to the caller
-	socket.on("answerCall", (data,name) => {
+	socket.on("answerCall", (data,name,videoStatus,audioStatus) => {
 		console.log(name + " tried to answer call");
-		io.to(data.to).emit("callAccepted", data.signal,name)
+		io.to(data.to).emit("callAccepted", data.signal,name,videoStatus,audioStatus)
 	});
 
 	// event to send a message in the meeting
@@ -69,7 +69,18 @@ io.on("connection", (socket) => {
 	socket.on("public-message",(name,message)=>{
 		console.log("public message : " + message);
 		socket.broadcast.emit('recieve-message',message,name);
-	})	
+	})
+	
+	// event to send canvas data
+	socket.on('canvas-data', (data,userId)=> {
+		io.to(userId).emit('canvas-data',data);		
+  	})
+
+	// event to clear canvas
+	socket.on('clear-canvas', (data,userId) => {
+		io.to(userId).emit('clear-canvas',data);
+	})
+	
 	
 
 });
