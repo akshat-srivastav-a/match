@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState,useContext} from 'react';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -6,7 +6,8 @@ import VideoPlayer from './components/VideoPlayer';
 import Sidebar from './components/Sidebar';
 import Notifications from './components/Notifications';
 import ChatBox from './components/ChatBox';
-import Board from './components/Board/Board';
+import Container from './components/Container/Container';
+import {SocketContext} from './Context';
 
 
 import {Grid} from '@material-ui/core';
@@ -37,9 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 const App = () => {
   const classes = useStyles();
-  
-
- 
+  const {callAccepted,callEnded,userId,socket} = useContext(SocketContext); 
 
   return (
     <div className={classes.wrapper}>
@@ -54,7 +53,16 @@ const App = () => {
       <Grid container spacing={1}>
         <Grid item md = {6} xs = {12}><ChatBox common = {true}></ChatBox></Grid>
         <Grid item md = {6} xs = {12}><ChatBox common = {false}></ChatBox></Grid>
-      </Grid>   
+      </Grid>
+      
+      {callAccepted && !callEnded &&
+        <Grid container>
+        <Grid item md = {12} xs = {12}>
+          <Container callAccepted = {callAccepted} callEnded = {callEnded} id = {userId.current} socket = {socket}/>
+        </Grid>
+        </Grid>      
+      }
+
       
     </div>
   );

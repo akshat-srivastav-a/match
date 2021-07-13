@@ -1,14 +1,14 @@
 import React from "react";
 import io from "socket.io-client";
 
+import {SocketContext} from'../../Context';
+
 import "./style.css";
 
-import { SocketContext } from '../../Context';
-
 class Board extends React.Component {
-  static contextType = SocketContext;
   timeout;
-  socket = this.context.socket;
+  // socket = io.connect("http://localhost:5000");
+  socket;
 
   ctx;
   isDrawing = false;
@@ -16,7 +16,12 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
+  }
+
+  componentDidMount() {
+    this.socket = this.props.socket;
     this.socket.on("canvas-data", function (data) {
+      // console.log("got here");
       var root = this;
       var interval = setInterval(function () {
         if (root.isDrawing) return;
@@ -33,9 +38,7 @@ class Board extends React.Component {
         image.src = data;
       }, 200);
     });
-  }
 
-  componentDidMount() {
     this.drawOnCanvas();
   }
 
@@ -103,8 +106,9 @@ class Board extends React.Component {
       if (root.timeout != undefined) clearTimeout(root.timeout);
       root.timeout = setTimeout(function () {
         var base64ImageData = canvas.toDataURL("image/png");
-        root.socket.emit("canvas-data", base64ImageData);
-      }, 1000);
+        // console.log(root.props.id);
+        root.socket.emit("canvas-data", base64ImageData,SocketContext.userId);
+      }, 100);
     };
   }
 

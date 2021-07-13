@@ -8,6 +8,8 @@ const SocketContext = createContext();
 //const socket = io('https://warm-wildwood-81069.herokuapp.com');
 const socket = io('https://match-video-chat.herokuapp.com/')
 
+var id = '';
+
 const ContextProvider = ({ children }) => {
   
   // keeping track of the status of the call
@@ -76,8 +78,9 @@ const ContextProvider = ({ children }) => {
     })
 
     socket.on("end-call", ()=>{
-      setCallAccepted(false);
+      
       setCallEnded(true);
+      SocketContext.userId ='';
     })
 
     socket.on('recieve-message', (message,name) => {
@@ -99,6 +102,7 @@ const ContextProvider = ({ children }) => {
 
     peer.on('signal', (data) => {
       userId.current = call.from;
+      SocketContext.userId = userId.current;
       // pass the signal data to transfer video and audio along with name,
       // video status and audio status      
       socket.emit('answerCall', { signal: data, to: call.from }, name,showMyVideo,showMyAudio);
@@ -120,6 +124,7 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     userId.current = id;
+    SocketContext.userId = id;
 
     // when we call a user we pass the signal data, id of user to call,
     // current user's id and the audio and video status
@@ -150,7 +155,8 @@ const ContextProvider = ({ children }) => {
   // called when the user clicks on the hand up button
   const leaveCall = () => {
     setCallEnded(true);
-
+    
+    SocketContext.userId = '';
     socket.emit('end-call',userId.current);
 
     connectionRef.current.destroy();
@@ -169,7 +175,7 @@ const ContextProvider = ({ children }) => {
 
   // function to send message in the open chat
   const sendCommonMessage = (message) => {
-    setCommonText((text)=>[...text,name + " : " + message]);
+    
     socket.emit('public-message',name,message);
   }
 
@@ -230,11 +236,14 @@ const ContextProvider = ({ children }) => {
       sendCommonMessage,
       commonText,
       setCommonText,
+      userId,
     }}
     >
       {children}
     </SocketContext.Provider>
   );
 };
+
+
 
 export { ContextProvider, SocketContext };

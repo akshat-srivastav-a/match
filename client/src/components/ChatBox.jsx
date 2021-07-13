@@ -36,13 +36,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ChatBox = ({common}) => {
-  console.log("common = " + common);
+  // console.log("common = " + common);
   const { name,text,setText,sendMessage,setCommonText,commonText,sendCommonMessage} = useContext(SocketContext);
   const [message,setMessage] = useState('');
   
   function addMessage(message){
     if(common){
-      
+      setCommonText((text)=>[...text,name + " : " + message]);
       sendCommonMessage(message);
     }
     else{

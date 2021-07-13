@@ -1,6 +1,6 @@
   
 import React from "react";
-import Board from "../board/Board";
+import Board from "../Board/Board";
 
 import "./style.css";
 
@@ -54,9 +54,10 @@ class Container extends React.Component {
             </select>
           </div>
         </div>
-
+        {console.log(this.props.id)}
         <div class="board-container">
-          <Board color={this.state.color} size={this.state.size}></Board>
+          <Board color={this.state.color} size={this.state.size} callAccepted = {this.state.callAccepted}
+            callEnded= {this.state.callEnded} id = {this.props.id}  socket = {this.props.socket}></Board>
         </div>
       </div>
     );

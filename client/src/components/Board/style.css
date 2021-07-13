@@ -1,7 +1,8 @@
 .board {
     width: 100%;
     height: 100%;
-    background-color: lightskyblue;
+    /* background-color: lightskyblue; */
+    background-color: white;
 }
 
 .sketch {
