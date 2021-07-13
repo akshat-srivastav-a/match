@@ -5,7 +5,6 @@ import Peer from 'simple-peer';
 const SocketContext = createContext();
 
 // const socket = io('http://localhost:5000');
-//const socket = io('https://warm-wildwood-81069.herokuapp.com');
 const socket = io('https://match-video-chat.herokuapp.com/')
 
 var id = '';
@@ -63,9 +62,8 @@ const ContextProvider = ({ children }) => {
       setShowUserAudio(audioStatus);
     });
 
-    socket.on("get-message",(name,message) => {
-      console.log("got here receiver");
-      // setText((text) => {return text + name + " : " + message + "\n"})
+    socket.on("get-message",(name,message) => {     
+      
       setText((text)=>[...text,name + " : " + message])
     })
 
@@ -174,8 +172,7 @@ const ContextProvider = ({ children }) => {
   }
 
   // function to send message in the open chat
-  const sendCommonMessage = (message) => {
-    
+  const sendCommonMessage = (message) => {    
     socket.emit('public-message',name,message);
   }
 

@@ -60,7 +60,7 @@ class Board extends React.Component {
     var mouse = { x: 0, y: 0 };
     var last_mouse = { x: 0, y: 0 };
 
-    /* Mouse Capturing Work */
+   
     canvas.addEventListener(
       "mousemove",
       function (e) {
@@ -73,7 +73,7 @@ class Board extends React.Component {
       false
     );
 
-    /* Drawing on Paint App */
+    
     ctx.lineWidth = this.props.size;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";

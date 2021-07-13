@@ -56,8 +56,7 @@ class Container extends React.Component {
         </div>
         {console.log(this.props.id)}
         <div class="board-container">
-          <Board color={this.state.color} size={this.state.size} callAccepted = {this.state.callAccepted}
-            callEnded= {this.state.callEnded} id = {this.props.id}  socket = {this.props.socket}></Board>
+          <Board color={this.state.color} size={this.state.size} socket = {this.props.socket}></Board>
         </div>
       </div>
     );

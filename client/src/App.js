@@ -43,7 +43,7 @@ const App = () => {
   return (
     <div className={classes.wrapper}>
       <AppBar className = {classes.appBar} position="static" color="inherit">
-        <Typography variant="h4" align="left">Match</Typography>
+        <Typography variant="h4" align="left">Convo</Typography>
       </AppBar>
 
       <VideoPlayer />
@@ -55,10 +55,11 @@ const App = () => {
         <Grid item md = {6} xs = {12}><ChatBox common = {false}></ChatBox></Grid>
       </Grid>
       
+      
       {callAccepted && !callEnded &&
         <Grid container>
         <Grid item md = {12} xs = {12}>
-          <Container callAccepted = {callAccepted} callEnded = {callEnded} id = {userId.current} socket = {socket}/>
+          <Container socket = {socket}/>
         </Grid>
         </Grid>      
       }
